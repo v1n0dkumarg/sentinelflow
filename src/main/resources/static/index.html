@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101513">
+  <title>SentinelFlow | Security operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/auth.css">
+</head>
+<body>
+  <aside class="rail">
+    <a class="brand" href="#overview" aria-label="SentinelFlow home"><span class="brand-mark">S</span><span>sentinel<span class="brand-light">flow</span></span></a>
+    <div class="rail-label">WORKSPACE</div>
+    <nav aria-label="Main navigation">
+      <a class="nav-link active" href="#overview"><span class="nav-icon">◫</span>Overview</a>
+      <a class="nav-link" href="#events"><span class="nav-icon">≋</span>Event explorer</a>
+      <a class="nav-link" href="#incidents"><span class="nav-icon">◎</span>Incidents <span class="nav-count" id="incident-count">0</span></a>
+      <a class="nav-link disabled" href="#rules" aria-disabled="true"><span class="nav-icon">⌘</span>Detection rules <span class="soon">LATER</span></a>
+      <a class="nav-link disabled" href="#playbooks" aria-disabled="true"><span class="nav-icon">↗</span>Playbooks <span class="soon">LATER</span></a>
+    </nav>
+    <div class="rail-bottom"><span class="status-dot"></span><span>LOCAL DEMO</span><span class="rail-version">v0.1</span></div>
+  </aside>
+
+  <main class="workspace">
+    <header class="topbar"><div><span class="crumb">Workspace</span><span class="crumb-slash">/</span><strong>Security overview</strong></div><div class="top-right"><span class="demo-tag">SYNTHETIC DATA</span><button id="sign-out" class="avatar" type="button" title="Sign out" aria-label="Sign out">MC</button></div></header>
+    <div class="page">
+      <section class="page-heading">
+        <div><p class="eyebrow">MONDAY, OCTOBER 31, 2026 <span class="live-dot"></span> LIVE</p><h1>Security overview</h1><p class="subhead">A clear view of event activity and analyst decisions.</p></div>
+        <button id="run-scenario" class="primary-button"><span>＋</span> Run demo scenario</button>
+      </section>
+
+      <section class="metrics" aria-label="Security metrics">
+        <article class="metric"><div class="metric-label">EVENTS INGESTED <span class="metric-mark">↗</span></div><div class="metric-value" id="metric-events">—</div><div class="metric-note">synthetic event stream</div></article>
+        <article class="metric"><div class="metric-label">OPEN INCIDENTS <span class="metric-mark orange">!</span></div><div class="metric-value" id="metric-incidents">—</div><div class="metric-note">awaiting analyst review</div></article>
+        <article class="metric"><div class="metric-label">PENDING APPROVALS <span class="metric-mark yellow">◷</span></div><div class="metric-value" id="metric-approvals">—</div><div class="metric-note">no action runs automatically</div></article>
+        <article class="metric signal"><div class="metric-label">INGESTION STATUS <span class="metric-mark green">●</span></div><div class="metric-value signal-value"><span class="signal-dot"></span>Nominal</div><div class="metric-note">API connected · local process</div></article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel event-panel" id="events">
+          <div class="panel-heading"><div><p class="eyebrow">TELEMETRY</p><h2>Recent events</h2></div><label class="search"><span>⌕</span><input id="event-search" type="search" placeholder="Filter events" aria-label="Filter events"></label></div>
+          <div class="table-scroll"><table><thead><tr><th>TIME</th><th>EVENT</th><th>IDENTITY</th><th>SOURCE IP</th><th>OUTCOME</th></tr></thead><tbody id="event-rows"><tr><td colspan="5" class="loading">Loading events…</td></tr></tbody></table></div>
+          <div class="panel-footer"><span id="event-total">0 events</span><span>Newest first</span></div>
+        </article>
+        <article class="panel incident-panel" id="incidents">
+          <div class="panel-heading"><div><p class="eyebrow">TRIAGE QUEUE</p><h2>Incidents</h2></div><span class="queue-pill" id="queue-count">0 OPEN</span></div>
+          <div id="incident-list" class="incident-list"><div class="empty-state"><span class="empty-icon">◎</span><strong>All quiet for now</strong><span>Run the demo scenario to create an incident.</span></div></div>
+          <div class="panel-note"><span class="lock-icon">▣</span>Response actions are simulated and require approval.</div>
+        </article>
+      </section>
+      <footer class="page-footer"><span>SentinelFlow</span><span>Defensive security training environment · All events are fictional</span></footer>
+    </div>
+  </main>
+  <div id="auth-overlay" class="auth-overlay" hidden>
+    <section class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <p class="eyebrow">SENTINELFLOW ACCESS</p><h2 id="auth-title">Sign in</h2>
+      <p class="auth-copy">Use an analyst or administrator account to open the security workspace.</p>
+      <form id="auth-form"><label>Username<input name="username" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required></label><button type="submit">Continue</button><p id="auth-error" aria-live="polite"></p></form>
+    </section>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
