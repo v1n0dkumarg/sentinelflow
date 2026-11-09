@@ -1,6 +1,7 @@
 package dev.portfolio.sentinelflow;
 
 import java.time.Instant;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,7 +64,8 @@ public class SentinelService {
         Instant createdAt = Instant.now();
         jdbc.update("INSERT INTO incidents (id, title, severity, status, created_at, username, source_ip) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            incidentId, "Repeated failures followed by successful sign-in", "HIGH", "NEW", createdAt, user, ip);
+            incidentId, "Repeated failures followed by successful sign-in", "HIGH", "NEW",
+            Timestamp.from(createdAt), user, ip);
         for (int index = 0; index < evidence.size(); index++) {
             jdbc.update("INSERT INTO incident_evidence (incident_id, event_id, position) VALUES (?, ?, ?)",
                 incidentId, evidence.get(index).id(), index);
@@ -101,7 +103,8 @@ public class SentinelService {
         SecurityEvent event = new SecurityEvent(UUID.randomUUID(), Instant.now(), username, sourceIp, eventType, outcome, detail);
         jdbc.update("INSERT INTO security_events (id, occurred_at, username, source_ip, event_type, outcome, detail) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            event.id(), event.timestamp(), event.username(), event.sourceIp(), event.eventType(), event.outcome(), event.detail());
+            event.id(), Timestamp.from(event.timestamp()), event.username(), event.sourceIp(), event.eventType(),
+            event.outcome(), event.detail());
         return event;
     }
 

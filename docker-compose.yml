@@ -36,11 +36,19 @@ services:
       retries: 20
     restart: unless-stopped
 
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - sentinelflow-ollama-data:/root/.ollama
+    restart: unless-stopped
+
   sentinelflow:
     build:
       context: .
     environment:
-      PORT: 8081
+      PORT: 8086
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sentinelflow
       SPRING_DATASOURCE_USERNAME: sentinelflow_app
       SPRING_DATASOURCE_PASSWORD: ${SENTINELFLOW_DB_PASSWORD:-local-sentinelflow-change-me}
@@ -53,15 +61,17 @@ services:
       ANALYST_PASSWORD: ${ANALYST_PASSWORD:-local-analyst-change-me}
       VIEWER_USERNAME: ${VIEWER_USERNAME:-viewer}
       VIEWER_PASSWORD: ${VIEWER_PASSWORD:-local-viewer-change-me}
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
     ports:
-      - "127.0.0.1:8081:8081"
+      - "127.0.0.1:8086:8086"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8081/actuator/health | grep -q 'UP'"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8086/actuator/health | grep -q 'UP'"]
       interval: 20s
       timeout: 3s
       retries: 5
@@ -71,3 +81,4 @@ services:
 volumes:
   sentinelflow-postgres-data:
   sentinelflow-redis-data:
+  sentinelflow-ollama-data:

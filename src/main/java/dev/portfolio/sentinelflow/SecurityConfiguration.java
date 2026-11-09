@@ -41,7 +41,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(frame -> frame.deny()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/index.html", "/app.js", "/styles.css", "/error", "/actuator/health/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/app.js", "/styles.css", "/auth.css", "/workspace.css", "/error", "/actuator/health/**").permitAll()
                         .requestMatchers("/actuator/prometheus").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/**").hasAnyRole("VIEWER", "ANALYST", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/incidents/*/actions/*/approval").hasRole("ADMIN")

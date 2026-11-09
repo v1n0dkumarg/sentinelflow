@@ -10,37 +10,39 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/auth.css">
+  <link rel="stylesheet" href="/workspace.css">
 </head>
 <body>
+  <div id="app-shell" hidden>
   <aside class="rail">
     <a class="brand" href="#overview" aria-label="SentinelFlow home"><span class="brand-mark">S</span><span>sentinel<span class="brand-light">flow</span></span></a>
     <div class="rail-label">WORKSPACE</div>
     <nav aria-label="Main navigation">
-      <a class="nav-link active" href="#overview"><span class="nav-icon">◫</span>Overview</a>
-      <a class="nav-link" href="#events"><span class="nav-icon">≋</span>Event explorer</a>
-      <a class="nav-link" href="#incidents"><span class="nav-icon">◎</span>Incidents <span class="nav-count" id="incident-count">0</span></a>
-      <a class="nav-link disabled" href="#rules" aria-disabled="true"><span class="nav-icon">⌘</span>Detection rules <span class="soon">LATER</span></a>
-      <a class="nav-link disabled" href="#playbooks" aria-disabled="true"><span class="nav-icon">↗</span>Playbooks <span class="soon">LATER</span></a>
+      <a class="nav-link" href="#overview" data-view="overview"><span class="nav-icon">◫</span>Overview</a>
+      <a class="nav-link" href="#events" data-view="events"><span class="nav-icon">≋</span>Event explorer</a>
+      <a class="nav-link" href="#incidents" data-view="incidents"><span class="nav-icon">◎</span>Incidents <span class="nav-count" id="incident-count">0</span></a>
+      <a class="nav-link" href="#rules" data-view="rules"><span class="nav-icon">⌘</span>Detection rules</a>
+      <a class="nav-link" href="#playbooks" data-view="playbooks"><span class="nav-icon">↗</span>Playbooks</a>
     </nav>
     <div class="rail-bottom"><span class="status-dot"></span><span>LOCAL DEMO</span><span class="rail-version">v0.1</span></div>
   </aside>
 
   <main class="workspace">
-    <header class="topbar"><div><span class="crumb">Workspace</span><span class="crumb-slash">/</span><strong>Security overview</strong></div><div class="top-right"><span class="demo-tag">SYNTHETIC DATA</span><button id="sign-out" class="avatar" type="button" title="Sign out" aria-label="Sign out">MC</button></div></header>
+    <header class="topbar"><div><span class="crumb">Workspace</span><span class="crumb-slash">/</span><strong id="breadcrumb-title">Security overview</strong></div><div class="top-right"><span class="demo-tag">SYNTHETIC DATA</span><button id="sign-out" class="avatar" type="button" title="Sign out" aria-label="Sign out">MC</button></div></header>
     <div class="page">
       <section class="page-heading">
-        <div><p class="eyebrow">MONDAY, OCTOBER 31, 2026 <span class="live-dot"></span> LIVE</p><h1>Security overview</h1><p class="subhead">A clear view of event activity and analyst decisions.</p></div>
+        <div><p class="eyebrow" id="page-eyebrow">WORKSPACE / OVERVIEW <span class="live-dot"></span> LIVE</p><h1 id="page-title">Security overview</h1><p class="subhead" id="page-description">A clear view of event activity and analyst decisions.</p></div>
         <button id="run-scenario" class="primary-button"><span>＋</span> Run demo scenario</button>
       </section>
 
-      <section class="metrics" aria-label="Security metrics">
+      <section class="metrics" id="metrics" aria-label="Security metrics">
         <article class="metric"><div class="metric-label">EVENTS INGESTED <span class="metric-mark">↗</span></div><div class="metric-value" id="metric-events">—</div><div class="metric-note">synthetic event stream</div></article>
         <article class="metric"><div class="metric-label">OPEN INCIDENTS <span class="metric-mark orange">!</span></div><div class="metric-value" id="metric-incidents">—</div><div class="metric-note">awaiting analyst review</div></article>
         <article class="metric"><div class="metric-label">PENDING APPROVALS <span class="metric-mark yellow">◷</span></div><div class="metric-value" id="metric-approvals">—</div><div class="metric-note">no action runs automatically</div></article>
         <article class="metric signal"><div class="metric-label">INGESTION STATUS <span class="metric-mark green">●</span></div><div class="metric-value signal-value"><span class="signal-dot"></span>Nominal</div><div class="metric-note">API connected · local process</div></article>
       </section>
 
-      <section class="content-grid">
+      <section class="content-grid" id="content-grid">
         <article class="panel event-panel" id="events">
           <div class="panel-heading"><div><p class="eyebrow">TELEMETRY</p><h2>Recent events</h2></div><label class="search"><span>⌕</span><input id="event-search" type="search" placeholder="Filter events" aria-label="Filter events"></label></div>
           <div class="table-scroll"><table><thead><tr><th>TIME</th><th>EVENT</th><th>IDENTITY</th><th>SOURCE IP</th><th>OUTCOME</th></tr></thead><tbody id="event-rows"><tr><td colspan="5" class="loading">Loading events…</td></tr></tbody></table></div>
@@ -52,16 +54,45 @@
           <div class="panel-note"><span class="lock-icon">▣</span>Response actions are simulated and require approval.</div>
         </article>
       </section>
+      <section id="feature-page" class="panel feature-page" hidden aria-live="polite">
+        <div class="feature-intro">
+          <span id="feature-mark" class="feature-mark" aria-hidden="true">⌘</span>
+          <p class="eyebrow" id="feature-eyebrow">DETECTION / RULES</p>
+          <h2 id="feature-title"></h2>
+          <p id="feature-description"></p>
+        </div>
+        <div id="rules-content" class="feature-detail" hidden>
+          <div class="feature-label">LOCAL OLLAMA GENERATION <span>HUMAN REVIEW REQUIRED</span></div>
+          <div class="artifact-generator">
+            <label>Source incident<select id="rule-incident" aria-label="Incident for detection rule"></select></label>
+            <button id="generate-rule" class="primary-button" type="button">Generate detection rule</button>
+          </div>
+          <p class="feature-note">Rules are evidence-grounded drafts. They are not evaluated against incoming events.</p>
+          <div id="rules-artifact-list" class="artifact-list" aria-live="polite"></div>
+        </div>
+        <div id="playbooks-content" class="feature-detail" hidden>
+          <div class="feature-label">LOCAL OLLAMA GENERATION <span>HUMAN REVIEW REQUIRED</span></div>
+          <div class="artifact-generator">
+            <label>Source incident<select id="playbook-incident" aria-label="Incident for playbook"></select></label>
+            <button id="generate-playbook" class="primary-button" type="button">Generate playbook</button>
+          </div>
+          <p class="feature-note">Playbooks are investigation guidance only. No generated step can run or change an external system.</p>
+          <div id="playbooks-artifact-list" class="artifact-list" aria-live="polite"></div>
+        </div>
+      </section>
       <footer class="page-footer"><span>SentinelFlow</span><span>Defensive security training environment · All events are fictional</span></footer>
     </div>
   </main>
-  <div id="auth-overlay" class="auth-overlay" hidden>
-    <section class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
-      <p class="eyebrow">SENTINELFLOW ACCESS</p><h2 id="auth-title">Sign in</h2>
-      <p class="auth-copy">Use an analyst or administrator account to open the security workspace.</p>
-      <form id="auth-form"><label>Username<input name="username" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required></label><button type="submit">Continue</button><p id="auth-error" aria-live="polite"></p></form>
-    </section>
   </div>
+  <main id="auth-overlay" class="auth-overlay">
+    <div class="auth-brand"><span class="brand-mark">S</span><span>sentinel<span class="brand-light">flow</span></span></div>
+    <section class="auth-dialog" aria-labelledby="auth-title">
+      <p class="eyebrow">SECURE WORKSPACE ACCESS</p><h1 id="auth-title">Sign in</h1>
+      <p class="auth-copy">Sign in with your SentinelFlow account to review events and incidents.</p>
+      <form id="auth-form"><label>Username<input name="username" autocomplete="username" autocapitalize="none" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><p id="auth-error" aria-live="polite"></p></form>
+      <p class="auth-note">Local demo · Synthetic security data</p>
+    </section>
+  </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="/app.js" defer></script>
 </body>

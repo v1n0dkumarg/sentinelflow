@@ -2,9 +2,13 @@ package dev.portfolio.sentinelflow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
@@ -30,6 +34,12 @@ class PersistenceIntegrationTest {
     @Autowired
     private SentinelService service;
 
+    @Autowired
+    private AiArtifactService aiArtifacts;
+
+    @Autowired
+    private JdbcTemplate jdbc;
+
     @DynamicPropertySource
     static void configureInfrastructure(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
@@ -53,5 +63,14 @@ class PersistenceIntegrationTest {
         Incident updated = service.decideAction(incident.id(), action.id(), "APPROVED");
         assertEquals("APPROVED", updated.actions().stream()
                 .filter(candidate -> candidate.id().equals(action.id())).findFirst().orElseThrow().approvalStatus());
+
+        UUID artifactId = UUID.randomUUID();
+        jdbc.update("INSERT INTO ai_artifacts (id, artifact_type, incident_id, content, status, created_at) "
+                + "VALUES (?, 'DETECTION_RULE', ?, ?::jsonb, 'DRAFT', ?)",
+            artifactId, incident.id(), "{\"name\":\"Repeated login draft\"}", Timestamp.from(Instant.now()));
+        assertEquals(1, aiArtifacts.list(AiArtifact.Type.DETECTION_RULE).size());
+        AiArtifact reviewed = aiArtifacts.review(artifactId, "APPROVED", "analyst");
+        assertEquals("APPROVED", reviewed.status());
+        assertEquals("analyst", reviewed.reviewedBy());
     }
 }

@@ -10,5 +10,5 @@ RUN apk add --no-cache wget && addgroup -S app && adduser -S app -G app
 WORKDIR /app
 COPY --from=build /workspace/target/sentinelflow-0.1.0.jar /app/app.jar
 USER app
-EXPOSE 8081
+EXPOSE 8086
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]

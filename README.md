@@ -15,6 +15,7 @@ The SOC workspace is organized around a recent-event table and incident triage q
 - Password-protected Redis JSON read cache with app-specific key prefix and 30-second TTL.
 - Spring Security HTTP Basic roles: `ADMIN`, `ANALYST`, and `VIEWER`.
 - Spring Boot Actuator health and Prometheus metrics.
+- Spring AI with local Ollama for incident-grounded detection rule and investigation playbook drafts.
 - Non-root multi-stage Docker image, Compose health checks, named data volumes, and GitHub Actions CI.
 - Tests for domain behavior, authorization boundaries, and Docker-optional PostgreSQL/Redis persistence.
 
@@ -53,7 +54,15 @@ Copy-Item .env.example .env
 docker compose up --build
 ```
 
-Open [http://localhost:8081](http://localhost:8081). PostgreSQL and Redis are private to the Compose network except for loopback-bound developer ports `5433` and `6381`. Stop the project with `docker compose down`; named volumes preserve data. `docker compose down -v` removes the data volumes.
+Open [http://localhost:8086](http://localhost:8086). PostgreSQL and Redis are private to the Compose network except for loopback-bound developer ports `5433` and `6381`. Stop the project with `docker compose down`; named volumes preserve data. `docker compose down -v` removes the data volumes.
+
+Pull the default local model once after starting the stack:
+
+```powershell
+docker compose exec ollama ollama pull qwen2.5:3b
+```
+
+Generation is available from the Detection Rules and Playbooks views for existing incidents. Generated artifacts are persisted as drafts, require analyst or admin review, and never execute response actions. If Ollama or the model is unavailable, the rest of the app remains available and generation reports an error. Set `OLLAMA_MODEL` in `.env` to use another Ollama model.
 
 ## Build, Test, And Run Locally
 
@@ -105,6 +114,10 @@ curl.exe -u viewer:local-viewer-change-me http://localhost:8081/api/v1/events
 | --- | --- | --- |
 | `GET` | `/api/v1/events` | Viewer or higher |
 | `GET` | `/api/v1/incidents` | Viewer or higher |
+| `GET` | `/api/v1/ai/artifacts` | Viewer or higher |
+| `POST` | `/api/v1/incidents/{incidentId}/detection-rules` | Analyst or admin |
+| `POST` | `/api/v1/incidents/{incidentId}/playbooks` | Analyst or admin |
+| `POST` | `/api/v1/ai/artifacts/{artifactId}/review` | Analyst or admin |
 | `POST` | `/api/v1/demo/suspicious-login` | Analyst or admin |
 | `POST` | `/api/v1/incidents/{incidentId}/actions/{actionId}/approval` | Admin |
 | `GET` | `/actuator/health` | Public health status |
